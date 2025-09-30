@@ -2,8 +2,7 @@
 
 namespace Yunusbek\AdaptiveApi;
 
-use app\components\traits\sqlMakers\public\CteConstants;
-use app\models\BaseModel;
+use Yunusbek\AdaptiveApi\CteConstants;
 use PHPSQLParser\PHPSQLParser;
 use yii\db\Exception;
 
@@ -52,7 +51,7 @@ class ASTValidator
                 } catch (\Throwable $e) {
                     $this->errors[] = [
                         'path' => "[statement_{$i}]",
-                        'value' => preg_replace('/SQLSTATE\[\d+\]: /', '', BaseModel::modelErrorsToString($e)),
+                        'value' => preg_replace('/SQLSTATE\[\d+\]: /', '', SqlBuilder::modelErrorsToString($e)),
                         'reason' => 'SQL parse failed or invalid syntax',
                     ];
                 }
