@@ -3,7 +3,7 @@
 namespace Yunusbek\AdaptiveApi\builders;
 
 use Yunusbek\AdaptiveApi\ASTValidator;
-use Yunusbek\AdaptiveApi\public\CteConstants;
+use Yunusbek\AdaptiveApi\CteConstants;
 use Yunusbek\AdaptiveApi\traits\CteToolsTrait;
 use Throwable;
 use yii\base\Model;

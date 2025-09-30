@@ -1,6 +1,6 @@
 <?php
 
-namespace Yunusbek\AdaptiveApi\public;
+namespace Yunusbek\AdaptiveApi;
 
 class CteConstants
 {

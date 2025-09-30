@@ -3,7 +3,7 @@
 namespace Yunusbek\AdaptiveApi;
 
 use Yunusbek\AdaptiveApi\builders\SqlBuilder;
-use Yunusbek\AdaptiveApi\public\CteConstants;
+use Yunusbek\AdaptiveApi\CteConstants;
 use Throwable;
 use yii\base\InvalidConfigException;
 use yii\db\Exception;

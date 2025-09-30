@@ -2,7 +2,7 @@
 
 namespace Yunusbek\AdaptiveApi\traits;
 
-use Yunusbek\AdaptiveApi\public\CteConstants;
+use Yunusbek\AdaptiveApi\CteConstants;
 use Exception;
 use yii\base\InvalidConfigException;
 use yii\db\ExpressionInterface;
