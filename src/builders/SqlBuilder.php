@@ -2,9 +2,9 @@
 
 namespace Yunusbek\AdaptiveApi\builders;
 
-use app\components\traits\sqlMakers\ASTValidator;
-use app\components\traits\sqlMakers\public\CteConstants;
-use app\components\traits\sqlMakers\traits\CteToolsTrait;
+use Yunusbek\AdaptiveApi\ASTValidator;
+use Yunusbek\AdaptiveApi\public\CteConstants;
+use Yunusbek\AdaptiveApi\traits\CteToolsTrait;
 use Throwable;
 use yii\base\Model;
 use yii\db\Exception;
