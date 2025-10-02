@@ -31,8 +31,25 @@ class m999999_999999_create_api_permissions extends Migration
     public function safeUp()
     {
         // API role va user
-        $this->execute("CREATE ROLE {$this->roleName} NOINHERIT;");
-        $this->execute("CREATE ROLE {$this->userName} LOGIN PASSWORD '{$this->password}';");
+        // API role va user
+        $this->execute("
+        DO $$
+        BEGIN
+           IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = '{$this->roleName}') THEN
+              CREATE ROLE {$this->roleName} INHERIT;
+           END IF;
+        END
+        $$;
+        ");
+        $this->execute("
+        DO $$
+        BEGIN
+           IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = '{$this->userName}') THEN
+              CREATE ROLE {$this->userName} LOGIN PASSWORD '{$this->password}';
+           END IF;
+        END
+        $$;
+        ");
         $this->execute("GRANT {$this->roleName} TO {$this->userName};");
 
         // Databasega ulanish ruxsati

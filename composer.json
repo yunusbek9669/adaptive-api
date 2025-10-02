@@ -5,7 +5,8 @@
     "license": "MIT",
     "require": {
         "yiisoft/yii2": "^2.0",
-        "greenlion/php-sql-parser": "^4.7"
+        "greenlion/php-sql-parser": "^4.7",
+        "vlucas/phpdotenv": "^5.6"
     },
     "autoload": {
         "psr-4": {

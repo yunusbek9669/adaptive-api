@@ -27,10 +27,34 @@ or add
 
 to the ```require``` section of your composer.json.
 
-Usage
+
+Installation
 ------------
 
-Once the library is installed, add the following to your project settings:
+1. Create ```.env``` file in the root of your application:
+```dotenv
+API_DB_ROLE=api_reader
+API_DB_USER=api_user_api
+API_DB_PASSWORD=_@p!_reaDer_
+#API_DB_HOST=localhost
+#API_DB_NAME=your-dbname
+#API_DB_PORT=5432
+UPLOAD_FOLDER_PATH=/uploads/
+```
+
+2. Load ```.env``` inside ```web/index.php``` and root ```yii``` file:
+```php
+#...
+$dotenv = Dotenv\Dotenv::createUnsafeMutable(dirname(__DIR__.'/../.env'));
+$dotenv->load();
+#...
+```
+
+3. Run migration to create the ```api_user``` database user and apply permissions:
+```sh
+php yii migrate --migrationPath=@vendor/yunusbek/adaptive-api/src/migrations
+```
+
 
 ```php
 # Add the following code to controllerMap
