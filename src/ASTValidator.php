@@ -6,9 +6,11 @@ use Yunusbek\AdaptiveApi\builders\SqlBuilder;
 use Yunusbek\AdaptiveApi\CteConstants;
 use PHPSQLParser\PHPSQLParser;
 use yii\db\Exception;
+use Yunusbek\AdaptiveApi\traits\JsonTrait;
 
 class ASTValidator
 {
+    use JsonTrait;
     private array $errors = [];
     public static array $dangWords = [
         'insert', 'delete', 'drop', 'update', 'alter', 'truncate', 'create', 'exec', '--', ';'
@@ -26,11 +28,13 @@ class ASTValidator
 
     public static function rootRelationDataTypes(string $type): bool
     {
+//        return in_array($type, JsonTrait::$json['root_relation']);
         return in_array($type, CteConstants::employeeDataTypeList());
     }
 
     public static function referenceDataTypes(string $type): bool
     {
+//        return in_array($type, JsonTrait::$json['reference']);
         return in_array($type, CteConstants::referenceDataTypeList());
     }
 
