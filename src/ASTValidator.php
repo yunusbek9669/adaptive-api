@@ -258,7 +258,7 @@ class ASTValidator
             }
         }
         /** Ruxsat etilgan functionlar */
-        $allowedSqlFunctions = ['CASE', 'WHEN', 'THEN', 'ELSE', 'END', 'CONCAT', 'COALESCE', 'CAST', 'NULLIF', 'UPPER', 'LOWER', 'LENGTH', 'SUBSTRING', 'TRIM', 'POSITION'];
+        $allowedSqlFunctions = ['CASE', 'WHEN', 'THEN', 'ELSE', 'END', 'TO_CHAR', 'TO_TIMESTAMP', 'CONCAT', 'COALESCE', 'CAST', 'NULLIF', 'UPPER', 'LOWER', 'LENGTH', 'SUBSTRING', 'TRIM', 'POSITION'];
 
         /** xavfsiz sql ifodalari */
         $safeSqlPattern = '/^[a-zA-Z0-9_$. ()=><\'",\-+*\/:]+$/u';
@@ -287,10 +287,6 @@ class ASTValidator
 
                 if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$|^\*$/', $column)) {
                     throw new \Exception("⛔️ Invalid column name in '{$match[0]}'");
-                }
-
-                if ($column === 'employee_id') {
-                    throw new \Exception("⛔️ Undefined column: 7 ERROR: column $alias.$column does not exist");
                 }
 
                 if (!self::$dataTypeList($alias)) {

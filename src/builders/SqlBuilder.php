@@ -58,7 +58,7 @@ class SqlBuilder
             $remainingCount = $data[0]['remaining_count'] ?? null;
             foreach ($data as &$value)
             {
-                unset($data['root_number'], $data['last_number'], $data['remaining_count'], $data['employee_id']);
+                unset($data['root_number'], $data['last_number'], $data['remaining_count']);
 
                 if (is_array($value)) {
                     $value = $this->jsonToArray($value, $params, $callbackList);

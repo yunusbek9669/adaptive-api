@@ -148,6 +148,7 @@ class CteBuilder extends SqlBuilder
      */
     private function setCteList(array $list, string $type): array
     {
+        $schema = \Yii::$app->db->schema;
         foreach ($list as $cteKey => &$config)
         {
             if (!isset($config['class']) && empty($config['data']) && !isset($config['table']) && !isset($config['with'])) {
@@ -169,7 +170,7 @@ class CteBuilder extends SqlBuilder
             if (isset($config['select']) && !is_array($config['select'])) {
                 throw new InvalidConfigException("The 'select' property must be an array for [$cteKey].");
             } elseif (!isset($config['select'])) {
-                throw new InvalidConfigException("The 'select' property must not be empty for [$cteKey].");
+                $config['select'] = array_keys($schema->getTableSchema($config['table'])->columns);
             }
             if ($this->data_type === CteConstants::ROOT_RELATION_DATA_TYPE && $cteKey !== $this->from && (!isset($config['on']) || !is_array($config['on']) || count($config['on']) > 1)) {
                 throw new InvalidConfigException("The 'on' property must contain exactly one associative array in the format ['(this)column' => 'root.column'] for relation [$cteKey].");

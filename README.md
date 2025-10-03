@@ -103,6 +103,7 @@ Example to api request structure
       "person": "{user}.username",
       "email": "{user}.email",
       "gender": "{user}.gender",
+      "age": "TO_CHAR(TO_TIMESTAMP({user}.age), 'DD.MM.YYYY')",
       "personal_phone": "{user}.phone",
       "personal_address": "{user}.address"
     },
@@ -111,6 +112,15 @@ Example to api request structure
       "company_email": "{company}.email",
       "company_phone": "{company}.phone",
       "company_address": "{company}.address"
+    },
+    "position_info": {
+      "user_department": "{position}.department",
+      "user_position": "{position}.name",
+      "product_info": {
+        "product_name": "{product}.name",
+        "product_type": "{product}.type",
+        "product_cost": "{product}.cost"
+      }
     }
   }
 }
@@ -131,6 +141,15 @@ result
       "company_email": "example@example.com",
       "company_phone": "+9989********",
       "company_address": "Some address data"
+    },
+    "position_info": {
+      "user_department": "Sales department",
+      "user_position": "seller",
+      "product_info": {
+        "product_name": "Bicycle",
+        "product_type": "Sport",
+        "product_cost": "$33.5"
+      }
     }
   }
 }
@@ -140,29 +159,79 @@ result
 ```php
 $root = [
     'unique_number' => 'user_id',
-        'select' => [
-            "user_id",
-            "company_id",
-            "started_date",
-            "status",
-            "product_id" => "product.id",
-        ],
-        'class' => UserRelCompany::class, // or by table name 'table' => 'user_rel_company'
-        'join' => [
-            ['JOIN', "products AS product", 'on' => ["user_id" => "user_id"], 'condition' => ['status' => 'ACTIVE']]
-        ],
-        'where' => [
-            'current_company' => true,
-            'product.type' => ['building', 'food', 'sport']
-        ],
-        'filter' => [
-            'product_type' => "product.type",
-        ]
+    'select' => [
+        "user_id",
+        "position_id",
+        "company_id",
+        "product_id" => "product.id",
+        "started_date",
+        "status",
+    ],
+    'class' => UserRelCompany::class, // or by table name 'table' => 'user_rel_company'
+    'join' => [
+        ['JOIN', "products AS product", 'on' => ["user_id" => "user_id"], 'condition' => ['status' => 'ACTIVE']]
+    ],
+    'where' => [
+        'current_company' => true,
+        'product.type' => ['building', 'food', 'sport']
+    ],
+    'filter' => [
+        'product_type' => "product.type",
     ]
 ];
 
 $relations = [
-
+    'user' => [
+        'on' => ["id" => "user_id"],
+        'class' => Users::class // or users_table_name,
+        'select' => [
+            "username",
+            "email",
+            "gender",
+            "phone",
+            "address",
+        ],
+        'where' => [
+            'status' => 'ACTIVE'
+        ]
+    ],
+    'company' => [
+        'on' => ["id" => "company_id"],
+        'class' => Companies::class // or companies_table_name,
+        'select' => [
+            "company_name" => 'name',
+            "email",
+            "phone",
+            "address",
+        ],
+        'where' => [
+            'status' => 'ACTIVE'
+        ]
+    ],
+    'position' => [
+        'on' => ["id" => "position_id"],
+        'class' => UserStaffPosition::class,
+        'select' => [
+            "name",
+            "department",
+        ],
+        'where' => [
+            'status' => 'ACTIVE'
+        ]
+    ],
+    'product' => [
+        'on' => ["id" => "product_id"],
+        'class' => Products::class // or products_table_name,
+        'select' => [
+            "name",
+            "type",
+            "cost",
+        ],
+        'where' => [
+            'status' => 'ACTIVE'
+        ]
+    ],
+    #... other relations tables
 ];
 $response = CteBuilder::root($root) // root table
     ->relation($relations)          // relation tables
