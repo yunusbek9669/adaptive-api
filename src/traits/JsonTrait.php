@@ -28,8 +28,6 @@ trait JsonTrait
             } else {
                 throw new InvalidConfigException("Invalid JSON structure detected in {$jsonFile}.");
             }
-        } else {
-            throw new InvalidConfigException("The file {$jsonFile} could not be found. Please run the {\" php yii api-schema \"} command.");
         }
         return self::$json;
     }

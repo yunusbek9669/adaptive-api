@@ -10,6 +10,7 @@ use Yunusbek\AdaptiveApi\traits\JsonTrait;
 class ASTValidator
 {
     use JsonTrait;
+
     private array $errors = [];
     public static array $dangWords = [
         'insert', 'delete', 'drop', 'update', 'alter', 'truncate', 'create', 'exec', '--', ';'
@@ -27,12 +28,12 @@ class ASTValidator
 
     public static function rootRelationDataTypes(string $type): bool
     {
-        return in_array($type, self::getJson()['root_relation']);
+        return empty(self::getJson()['root_relation']) || in_array($type, self::getJson()['root_relation']);
     }
 
     public static function referenceDataTypes(string $type): bool
     {
-        return in_array($type, self::getJson()['reference']);
+        return empty(self::getJson()['reference']) || in_array($type, self::getJson()['reference']);
     }
 
     public function validate(string $sql): array
