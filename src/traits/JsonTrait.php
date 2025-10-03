@@ -16,7 +16,7 @@ trait JsonTrait
     public static function getJson()
     {
         $path = getenv('API_SCHEMA_FILE_PATH') ?? CteConstants::CTE_ROOT_SCHEMA_PATH;
-        $jsonFile = str_replace('//', DIRECTORY_SEPARATOR, Yii::getAlias('@app') .'/'. $path.'/api-schema.json');
+        $jsonFile = str_replace('//', DIRECTORY_SEPARATOR, Yii::getAlias('@webroot') .'/'. $path.'/api-schema.json');
         if (file_exists($jsonFile)) {
             $jsonContent = file_get_contents($jsonFile);
             $decoded = json_decode($jsonContent, true);

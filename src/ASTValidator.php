@@ -3,7 +3,6 @@
 namespace Yunusbek\AdaptiveApi;
 
 use Yunusbek\AdaptiveApi\builders\SqlBuilder;
-use Yunusbek\AdaptiveApi\CteConstants;
 use PHPSQLParser\PHPSQLParser;
 use yii\db\Exception;
 use Yunusbek\AdaptiveApi\traits\JsonTrait;
@@ -28,14 +27,12 @@ class ASTValidator
 
     public static function rootRelationDataTypes(string $type): bool
     {
-        return in_array($type, JsonTrait::$json['root_relation']);
-//        return in_array($type, CteConstants::employeeDataTypeList());
+        return in_array($type, self::getJson()['root_relation']);
     }
 
     public static function referenceDataTypes(string $type): bool
     {
-        return in_array($type, JsonTrait::$json['reference']);
-//        return in_array($type, CteConstants::referenceDataTypeList());
+        return in_array($type, self::getJson()['reference']);
     }
 
     public function validate(string $sql): array
