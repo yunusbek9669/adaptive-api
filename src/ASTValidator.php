@@ -28,14 +28,14 @@ class ASTValidator
 
     public static function rootRelationDataTypes(string $type): bool
     {
-//        return in_array($type, JsonTrait::$json['root_relation']);
-        return in_array($type, CteConstants::employeeDataTypeList());
+        return in_array($type, JsonTrait::$json['root_relation']);
+//        return in_array($type, CteConstants::employeeDataTypeList());
     }
 
     public static function referenceDataTypes(string $type): bool
     {
-//        return in_array($type, JsonTrait::$json['reference']);
-        return in_array($type, CteConstants::referenceDataTypeList());
+        return in_array($type, JsonTrait::$json['reference']);
+//        return in_array($type, CteConstants::referenceDataTypeList());
     }
 
     public function validate(string $sql): array
