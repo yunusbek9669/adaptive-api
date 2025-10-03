@@ -13,7 +13,7 @@ trait RootRelationTrait
     public function rootCteMaker(): void
     {
         $data = $this->cteList[$this->from];
-        $this->partHelper($this->from, $data);
+//        $this->partHelper($this->from, $data);
         $condition = [];
         foreach ($this->params['condition'] as $key => $val) {
             if ($key === 'unique_number') {
@@ -24,7 +24,7 @@ trait RootRelationTrait
         }
 
         $this->with[$this->from] = <<<SQL
-        WITH {$this->from} AS MATERIALIZED (
+        WITH {$this->from} AS (
                 SELECT DISTINCT ON ({$this->from}.{$data['unique_number']}) 
                     {$this->selectSql($data['select'])},
                     COUNT(*) OVER() AS total_count
@@ -54,12 +54,21 @@ trait RootRelationTrait
     {
         $this->cteList[$cte_name]['select'] = array_merge(['root_number' => "{$this->cteLimited}.unique_number"], $this->cteList[$cte_name]['select']);
         $data = $this->cteList[$cte_name];
+
+        /** (with) ishlatilgan bo'lsa uni sqlga chaqirib qo‘yish */
         if (isset($data['with'])) {
             $this->relationCteMaker($data['with']);
         }
-        if (!str_starts_with($cte_name, 'cte_')) {
+
+        /** (cte) ishlatilgan bo'lsa uni sqlga chaqirib qo‘yish */
+        if (isset($data['cte'])) {
+            $this->relationCteMaker($data['cte']);
+        }
+
+        if (!in_array($cte_name, array_keys($this->withList ?? []))) {
             $this->join[] = ['LEFT JOIN', $cte_name, 'on' => ["root_number" => $data['select']['root_number']]];
         }
+
         $this->partHelper($cte_name, $data);
         if (!empty($data['recursive'])) {
             $this->with[$cte_name] = $this->recursive($data, $cte_name);

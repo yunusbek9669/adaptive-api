@@ -11,7 +11,7 @@ use yii\db\Exception;
 class CteBuilder extends SqlBuilder
 {
     private array $root = [];
-    private array $withList = [];
+    public array $withList = [];
     private array $relation = [];
     private array $reference = [];
     private array $queryParams = [];
