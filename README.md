@@ -93,6 +93,7 @@ Example to permission schema
   }
 }
 ```
+
 Usage
 ---
 Example to api request structure
