@@ -14,6 +14,7 @@ trait ReferenceTrait
      */
     public function referenceCteMaker(string $cte_name, bool $is_root = false): void
     {
+        if ($is_root) { $this->from = $cte_name; }
         $data = $this->cteList[$cte_name];
         $from = str_contains(strtolower($data['table']), ' as ') ? $data['table'] : "{$data['table']} AS $cte_name";
         $this->partHelper($cte_name, $data);
