@@ -3,7 +3,6 @@
 namespace Yunusbek\AdaptiveApi;
 
 use Yunusbek\AdaptiveApi\builders\SqlBuilder;
-use Yunusbek\AdaptiveApi\CteConstants;
 use Throwable;
 use yii\base\InvalidConfigException;
 use yii\db\Exception;
@@ -20,6 +19,8 @@ class CteBuilder extends SqlBuilder
     private array $callbackList = [];
     protected string $data_type;
     public array $result = [];
+
+    public static array $schema = [];
 
     private function __construct() {}
 
@@ -123,6 +124,7 @@ class CteBuilder extends SqlBuilder
         $this->cteList = array_merge($this->cteList, $this->setCteList($this->withList, 'with'));
         $this->cteList = array_merge($this->cteList, $this->setCteList($this->relation, 'rootRelation'));
         $this->cteList = array_merge($this->cteList, $this->setCteList($this->reference, 'reference'));
+        self::$schema = array_keys($this->cteList);
         if (empty($this->template)) {
             throw new InvalidConfigException("The 'template' must not be empty.");
         }

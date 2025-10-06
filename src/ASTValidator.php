@@ -28,12 +28,12 @@ class ASTValidator
 
     public static function rootRelationDataTypes(string $type): bool
     {
-        return empty(self::getJson()['root_relation']) || in_array($type, self::getJson()['root_relation']);
+        return !empty(self::getJson()['root_relation']) && in_array($type, self::getJson()['root_relation']) || in_array($type, CteBuilder::$schema);
     }
 
     public static function referenceDataTypes(string $type): bool
     {
-        return empty(self::getJson()['reference']) || in_array($type, self::getJson()['reference']);
+        return !empty(self::getJson()['reference']) && in_array($type, self::getJson()['reference']) || in_array($type, CteBuilder::$schema);
     }
 
     public function validate(string $sql): array

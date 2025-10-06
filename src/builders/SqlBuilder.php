@@ -35,7 +35,6 @@ class SqlBuilder
             try {
                 $resultData = $this->queryBuilder($this->sqlParting(), $params, $dataTypeList);
             } catch (Exception $e) {
-                throw new \Exception($e);
                 throw new \Exception('⛔️ '.preg_replace('/SQLSTATE\[\d+\]: /', '', self::modelErrorsToString($e)));
             }
 
