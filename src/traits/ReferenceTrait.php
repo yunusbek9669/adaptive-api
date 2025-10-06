@@ -127,7 +127,7 @@ trait ReferenceTrait
                 SELECT COUNT(*) AS remaining_count
                 FROM {$data['table']} 
                 {$rootJoin}
-                WHERE (:last_number::integer IS NULL OR {$data['unique_number']} > :last_number::integer) {$and_where}
+                WHERE (:last_number::integer IS NULL OR {$data['table']}.{$data['unique_number']} > :last_number::integer) {$and_where}
             )
         SQL;
     }
