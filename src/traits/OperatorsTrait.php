@@ -15,7 +15,7 @@ trait OperatorsTrait
      */
     private function condition(array $condition, string $alias = null, string $prefix = null): ?string
     {
-        if (!empty($condition)) {
+        if (!empty($condition) && isset($this->from)) {
             $select = $this->cteList[$this->from]['select'];
             $where = [];
             if (isset($condition[0]) && is_array($condition[1])) {
