@@ -102,27 +102,33 @@ trait OperatorsTrait
 
     /** SELECT ichiga 'jsonb_build_object' qilib berish
      * @param string|array $data
-     * @param string|null $type
+     * @param string|int|null $type
      * @param string|null $key
      * @return string
      */
-    private function select(string|array $data, string $type = null, string &$key = null): string
+    private function select(string|array $data, string|int $type = null, string &$key = null): string
     {
         $condition = null;
         if (is_array($data)) {
             ASTValidator::detectIfNull($data, $condition, $type, $key);
             $flat = [];
             foreach ($data as $key => $value) {
-                $flat[] = "'".str_replace('{?}', '', $key)."'";
-                $flat[] = is_array($value) ? $this->select($value, null, $key) : (str_contains($value, '.*') ? "to_jsonb({$value})" : $value);
+                if (!empty($type)) {
+                    $flat[] = "'".str_replace('{?}', '', $key)."'";
+                    $flat[] = is_array($value) ? $this->select($value, null, $key) : (str_contains($value, '.*') ? "to_jsonb({$value})" : $value);
+                } else {
+                    $flat[] = is_array($value) ? $this->select($value, null, $key) : $value;
+                }
             }
             $data = implode(", ", $flat);
-            $data = "       jsonb_build_object({$data})";
+            if (!empty($type)) {
+                $data = "       jsonb_build_object({$data})";
+            }
         }
 
         if ($condition) { $data = "CASE WHEN COALESCE({$condition}) IS NOT NULL THEN {$data} END"; }
 
-        if (isset($type)) {
+        if (!empty($type)) {
             $type = str_replace('{?}', '', $type);
             if (str_ends_with($data, '.*')) {
                 $data = str_replace('.*', '', $data);

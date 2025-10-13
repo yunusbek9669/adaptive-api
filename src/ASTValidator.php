@@ -217,7 +217,7 @@ class ASTValidator
         if (is_array($dataForm)) {
             $newDataForm = [];
             foreach ($dataForm as $associativeKey => &$form) {
-                if (!ASTValidator::detectDangerousAlias($associativeKey, $form) && (empty($associativeKey) || strpbrk($associativeKey, " '")))
+                if (!ASTValidator::detectDangerousAlias($associativeKey, $form) && ((empty($associativeKey) && !is_int($associativeKey)) || strpbrk($associativeKey, " '")))
                 {
                     $near = trim(json_encode([$associativeKey => $form]), '"');
                     ASTValidator::errorMessage("{$near}", 'Alias name contains invalid word', 'warning');
