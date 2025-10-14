@@ -13,18 +13,20 @@ trait CteToolsTrait
     use RootRelationTrait;
     use ReferenceTrait;
 
+    public $countable = false;
+
     /** API so‘rovdan keladigan parametrlarni qayta ishlash
      * @param array $params
      * @param array $addition
-     * @param string $dataListType
      * @return array
      * @throws Exception
      */
-    protected function paramsHelper(array $params, array $addition, string $dataListType): array
+    protected function paramsHelper(array $params, array $addition): array
     {
+        $this->countable = isset($params['count']) && isset($params['count']);
         $data = [];
         $data['condition'] = [];
-        $data['count'] = (int)($params['count'] ?? ($dataListType === CteConstants::ROOT_RELATION_DATA_TYPE ? 1 : 100));
+        $data['count'] = (int)($params['count'] ?? 1);
         $data['last_number'] = (int)($params['last_number'] ?? 0);
         if (!empty($addition['query_params'])) {
             $data['query_params'] = [];

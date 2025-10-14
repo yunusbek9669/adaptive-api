@@ -38,7 +38,7 @@ class SqlBuilder
                 throw new \Exception('⛔️ '.preg_replace('/SQLSTATE\[\d+\]: /', '', self::modelErrorsToString($e)));
             }
 
-            return $this->jsonToArray($resultData, $params, $callbackList);
+            return $this->jsonToArray($this->countable ? $resultData : $resultData[0], $params, $callbackList);
         }
         return [];
     }
