@@ -128,7 +128,7 @@ trait OperatorsTrait
 
         if ($condition) { $data = "CASE WHEN COALESCE({$condition}) IS NOT NULL THEN {$data} END"; }
 
-        if (!empty($type)) {
+        if (!empty($type) && !is_int($type)) {
             $type = str_replace('{?}', '', $type);
             if (str_ends_with($data, '.*')) {
                 $data = str_replace('.*', '', $data);
