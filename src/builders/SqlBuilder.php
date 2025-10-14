@@ -131,7 +131,7 @@ class SqlBuilder
         ]);
         $param_list = [
             ':last_number' => (int)($params['last_number'] ?? null),
-            ':limit' => (int)($params['count'] ?? 1)
+            ':limit' => (int)($params['limit'] ?? 1)
         ];
         foreach ($params['query_params'] ?? [] as $key => $param) {
             $param_list[$key] = $param;

@@ -127,7 +127,7 @@ class CteBuilder extends SqlBuilder
             throw new InvalidConfigException("The 'template' must not be empty.");
         }
         $this->queryParams = array_merge($this->queryParams, Yii::$app->request->get());
-        $this->params = $this->paramsHelper($this->queryParams, ['query_params' => array_diff_key($this->queryParams, array_flip(['count', 'last_number']))], $this->data_type);
+        $this->params = $this->paramsHelper($this->queryParams, ['query_params' => array_diff_key($this->queryParams, array_flip(['limit', 'last_number']))], $this->data_type);
         $this->result = $this->jsonBuilder($this->template, $this->data_type, $this->callbackList);
 
         if ($this->countable) {

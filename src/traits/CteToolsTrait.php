@@ -23,10 +23,10 @@ trait CteToolsTrait
      */
     protected function paramsHelper(array $params, array $addition): array
     {
-        $this->countable = isset($params['count']) && isset($params['count']);
+        $this->countable = isset($params['limit']) && isset($params['limit']);
         $data = [];
         $data['condition'] = [];
-        $data['count'] = (int)($params['count'] ?? 1);
+        $data['limit'] = (int)($params['limit'] ?? 1);
         $data['last_number'] = (int)($params['last_number'] ?? 0);
         if (!empty($addition['query_params'])) {
             $data['query_params'] = [];

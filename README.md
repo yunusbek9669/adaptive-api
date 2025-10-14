@@ -246,3 +246,32 @@ $response = CteBuilder::root($root) // root table
     ->getApi();                     // finish
 ```
 ---
+
+# 📘 /reference API
+
+This endpoint is used to retrieve **reference data** from the system.  
+It supports filtering and limiting results, including filters on **related tables** (via joined relations).
+
+---
+
+## 🟢 GET /reference
+
+### 🧩 Description
+Fetches reference (dictionary) data.  
+You can limit the number of records and filter results by fields in the **main table** or in **related (joined) tables**.
+
+---
+
+### 🔸 Query Parameters
+
+| Parameter | Type | Required | Description |
+|------------|------|-----------|--------------|
+| `limit` | integer | No | Specifies the maximum number of records to return. |
+| `<alias>column` | string | No | Filters by a column in a **related table** that is linked to the main table via a relation. |
+
+---
+
+### 🧾 Example Request
+
+```bash
+GET /reference?limit=4&<department>code=av
