@@ -247,29 +247,44 @@ $response = CteBuilder::root($root) // root table
 ```
 ---
 
-# 📘 /reference API
+# 📘 `/reference` API
 
-This endpoint is used to retrieve **reference data** from the system.  
-It supports filtering and limiting results, including filters on **related tables** (via joined relations).
-
----
-
-## 🟢 GET /reference
-
-### 🧩 Description
-Fetches reference (dictionary) data.  
-You can limit the number of records and filter results by fields in the **main table** or in **related (joined) tables**.
+**Method:** `POST`  
+**Description:**  
+This endpoint returns reference data from related tables using dynamic field selection and alias-based filtering.  
+It supports both pagination (`limit`) and relation field filters (e.g. `<department>code=av`).
 
 ---
 
-### 🔸 Query Parameters
+## 🧩 Request Parameters
 
-| Parameter | Type | Required | Description |
-|------------|------|-----------|--------------|
-| `limit` | integer | No | Specifies the maximum number of records to return. |
-| `<alias>column` | string | No | Filters by a column in a **related table** that is linked to the main table via a relation. |
+### 🔹 Query Parameters
+
+| Name | Type | Required | Description |
+|------|------|-----------|--------------|
+| `limit` | `integer` | ❌ | The number of records to return. Example: `4` |
+| `<department>code` | `string` | ❌ | Filter applied to the related table `department.code`. Example: `av` |
+
+> 📝 **Note:**  
+> The `<department>` prefix indicates that the field belongs to a related (joined) table or alias.
 
 ---
+
+### 🔹 Request Body (JSON)
+
+| Field | Type | Required | Description |
+|--------|------|-----------|--------------|
+| `users` | `string` | ✅ | Pattern for selecting fields from the `users` CTE/table. `{users}.*` means “select all columns.” |
+| `department` | `string` | ✅ | Pattern for including all fields from the related `department` table or CTE. `<{department}>.*` means “include all columns.” |
+
+#### Example:
+
+```json
+{
+  "users": "{users}.*",
+  "department": "<{department}>.*"
+}
+```
 
 ### 🧾 Example Request
 
