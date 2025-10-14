@@ -37,8 +37,8 @@ trait CteToolsTrait
                 } elseif (preg_match("/(;|--|#|\/\*)[\s]*/", $param)) {
                     throw new Exception("⚠️ Invalid parameter value used: '{$param}'");
                 }
-                if (!preg_match('/^([a-zA-Z_][a-zA-Z0-9_]*)\.([a-zA-Z_][a-zA-Z0-9_]*)$/', $key, $matches)) {
-                    $data['condition'][$key] = ":query_param_{$iteration}";
+                if (!preg_match('/^([a-zA-Z_][a-zA-Z0-9_]*)\.([a-zA-Z_][a-zA-Z0-9_]*)$/', $key, $matches) && preg_match('/^<([a-zA-Z_][a-zA-Z0-9_]*)>([a-zA-Z_][a-zA-Z0-9_]*)$/', $key, $matches)) {
+                    $data['condition']["{$matches[1]}.{$matches[2]}"] = ":query_param_{$iteration}";
                 }
                 $data['query_params'][":query_param_{$iteration}"] = $param;
                 $iteration++;

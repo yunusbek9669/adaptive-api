@@ -3,9 +3,9 @@
 namespace Yunusbek\AdaptiveApi;
 
 use Yunusbek\AdaptiveApi\builders\SqlBuilder;
-use Throwable;
 use yii\base\InvalidConfigException;
 use yii\db\Exception;
+use Yii;
 
 class CteBuilder extends SqlBuilder
 {
@@ -126,9 +126,7 @@ class CteBuilder extends SqlBuilder
         if (empty($this->template)) {
             throw new InvalidConfigException("The 'template' must not be empty.");
         }
-        if (empty($this->queryParams)) {
-            throw new InvalidConfigException("The 'queryParams' must not be empty.");
-        }
+        $this->queryParams = array_merge($this->queryParams, Yii::$app->request->get());
         $this->params = $this->paramsHelper($this->queryParams, ['query_params' => array_diff_key($this->queryParams, array_flip(['count', 'last_number']))], $this->data_type);
         $this->result = $this->jsonBuilder($this->template, $this->data_type, $this->callbackList);
 
@@ -152,7 +150,7 @@ class CteBuilder extends SqlBuilder
      */
     private function setCteList(array $list, string $type): array
     {
-        $schema = \Yii::$app->db->schema;
+        $schema = Yii::$app->db->schema;
         foreach ($list as $cteKey => &$config)
         {
             if (!isset($config['class']) && empty($config['data']) && !isset($config['table']) && !isset($config['with'])) {
