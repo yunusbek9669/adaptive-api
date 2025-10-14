@@ -109,6 +109,11 @@ class CteBuilder extends SqlBuilder
      */
     public function getApi(): array
     {
+        /** requests */
+        $request = Yii::$app->request;
+        if (empty($this->template)) { $this->template = $request->post(); }
+        $this->queryParams = array_merge($this->queryParams, $request->get());
+
         if (
             (!empty($this->reference) && (!empty($this->root) || !empty($this->relation)))
             ||
@@ -123,10 +128,7 @@ class CteBuilder extends SqlBuilder
         $this->cteList = array_merge($this->cteList, $this->setCteList($this->relation, 'rootRelation'));
         $this->cteList = array_merge($this->cteList, $this->setCteList($this->reference, 'reference'));
         self::$schema = array_keys($this->cteList);
-        if (empty($this->template)) {
-            throw new InvalidConfigException("The 'template' must not be empty.");
-        }
-        $this->queryParams = array_merge($this->queryParams, Yii::$app->request->get());
+
         $this->params = $this->paramsHelper($this->queryParams, ['query_params' => array_diff_key($this->queryParams, array_flip(['limit', 'last_number']))], $this->data_type);
         $this->result = $this->jsonBuilder($this->template, $this->data_type, $this->callbackList);
 
