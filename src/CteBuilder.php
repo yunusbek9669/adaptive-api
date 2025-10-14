@@ -106,8 +106,6 @@ class CteBuilder extends SqlBuilder
 
     /**
      * @throws InvalidConfigException
-     * @throws \Exception
-     * @throws Throwable
      */
     public function getApi(): array
     {

@@ -73,7 +73,7 @@ trait ReferenceTrait
     {
         $snake_case = $this->camelToSnake($subAlias);
         $data['select'] = array_merge($data['select'], [
-            "{$snake_case}_unique_number" => "{$subAlias}.unique_number"
+            "{$snake_case}__unique_number" => "{$subAlias}.unique_number"
         ]);
         $for_root = $join;
         $for_root['on'] = ["unique_number" => "{$cte_name}.{$snake_case}_unique_number"];
