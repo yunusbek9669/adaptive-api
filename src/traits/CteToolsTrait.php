@@ -23,6 +23,16 @@ trait CteToolsTrait
      */
     protected function paramsHelper(array $params, array $addition): array
     {
+        $queryString = urldecode(\Yii::$app->request->queryString);
+        $realParams = [];
+        foreach (explode('&', $queryString) as $part) {
+            if (str_contains($part, '=')) {
+                [$key, $value] = explode('=', $part, 2);
+                if (!in_array($key, ['limit', 'last_number'])) {
+                    $realParams[] = $key;
+                }
+            }
+        }
         $this->countable = isset($params['limit']) && isset($params['limit']);
         $data = [];
         $data['condition'] = [];
@@ -32,8 +42,9 @@ trait CteToolsTrait
             $data['query_params'] = [];
             $iteration = 0;
             foreach ($addition['query_params'] as $key => $param) {
+                $errorKey = $realParams[$iteration] ?? $key;
                 if (preg_match("/(;|--|#|\/\*)[\s]*/", $key)) {
-                    throw new Exception("⚠️ Invalid parameter name used: '{$key}'");
+                    throw new Exception("⚠️ Invalid parameter key used: '{$errorKey}'");
                 } elseif (preg_match("/(;|--|#|\/\*)[\s]*/", $param)) {
                     throw new Exception("⚠️ Invalid parameter value used: '{$param}'");
                 }
@@ -41,6 +52,8 @@ trait CteToolsTrait
                     $data['condition']["{$matches[1]}.{$matches[2]}"] = ":query_param_{$iteration}";
                 } elseif (preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $key)) {
                     $data['condition'][$key] = ":query_param_{$iteration}";
+                } else {
+                    throw new Exception("⚠️ Invalid parameter key used: '{$errorKey}'");
                 }
                 $data['query_params'][":query_param_{$iteration}"] = $param;
                 $iteration++;
