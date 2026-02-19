@@ -5,6 +5,7 @@ namespace Yunusbek\AdaptiveApi;
 use Yunusbek\AdaptiveApi\builders\SqlBuilder;
 use yii\base\InvalidConfigException;
 use yii\db\Exception;
+use Throwable;
 use Yii;
 
 class CteBuilder extends SqlBuilder
@@ -106,6 +107,8 @@ class CteBuilder extends SqlBuilder
 
     /**
      * @throws InvalidConfigException
+     * @throws \Exception
+     * @throws Throwable
      */
     public function getApi(): array
     {
@@ -127,9 +130,15 @@ class CteBuilder extends SqlBuilder
         $this->cteList = array_merge($this->cteList, $this->setCteList($this->withList, 'with'));
         $this->cteList = array_merge($this->cteList, $this->setCteList($this->relation, 'rootRelation'));
         $this->cteList = array_merge($this->cteList, $this->setCteList($this->reference, 'reference'));
+        if (empty($this->template)) {
+            throw new InvalidConfigException("The 'template' must not be empty.");
+        }
+        if (empty($this->queryParams)) {
+            throw new InvalidConfigException("The 'queryParams' must not be empty.");
+        }
         self::$schema = array_keys($this->cteList);
 
-        $this->params = $this->paramsHelper($this->queryParams, ['query_params' => array_diff_key($this->queryParams, array_flip(['limit', 'last_number']))], $this->data_type);
+        $this->params = $this->paramsHelper($this->queryParams, ['query_params' => array_diff_key($this->queryParams, array_flip(['count', 'last_number']))], $this->data_type === CteConstants::ROOT_RELATION_DATA_TYPE);
         $this->result = $this->jsonBuilder($this->template, $this->data_type, $this->callbackList);
 
         if ($this->countable) {
@@ -155,14 +164,16 @@ class CteBuilder extends SqlBuilder
         $schema = Yii::$app->db->schema;
         foreach ($list as $cteKey => &$config)
         {
-            if (!isset($config['class']) && empty($config['data']) && !isset($config['table']) && !isset($config['with'])) {
-                throw new InvalidConfigException("Either the 'class' or 'table' or 'data' property must be specified for [$cteKey].");
+            if (!isset($config['class']) && empty($config['data']) && !isset($config['table']) && !isset($config['with']) && !isset($config['cte'])) {
+                throw new InvalidConfigException("Either the 'class', 'table', 'data', 'with' or 'cte' property must be specified for [$cteKey].");
             } elseif (isset($config['table']) && !is_string($config['table'])) {
                 throw new InvalidConfigException("The 'table' property must be a string for [$cteKey].");
             } elseif (isset($config['class']) && !str_contains($config['class'], '\\')) {
                 throw new InvalidConfigException("Invalid 'class' property for [$cteKey]: the specified class does not exist or cannot be autoloaded.");
             } elseif (isset($config['class']) && is_string($config['class'])) {
                 $config['table'] = $config['class']::tableName();
+            } elseif (isset($config['cte']) && is_string($config['cte'])) {
+                $config['table'] = $config['cte'];
             } elseif (isset($config['with']) && isset($this->withList[$config['with']])) {
                 $config['table'] = $config['with'];
             } elseif (!empty($config['data'])) {

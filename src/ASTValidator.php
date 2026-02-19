@@ -3,9 +3,9 @@
 namespace Yunusbek\AdaptiveApi;
 
 use Yunusbek\AdaptiveApi\builders\SqlBuilder;
+use Yunusbek\AdaptiveApi\traits\JsonTrait;
 use PHPSQLParser\PHPSQLParser;
 use yii\db\Exception;
-use Yunusbek\AdaptiveApi\traits\JsonTrait;
 
 class ASTValidator
 {
@@ -260,7 +260,8 @@ class ASTValidator
             }
         }
         /** Ruxsat etilgan functionlar */
-        $allowedSqlFunctions = ['CASE', 'WHEN', 'THEN', 'ELSE', 'END', 'TO_CHAR', 'TO_TIMESTAMP', 'CONCAT', 'COALESCE', 'CAST', 'NULLIF', 'UPPER', 'LOWER', 'LENGTH', 'SUBSTRING', 'TRIM', 'POSITION'];
+        $columnTypeCasting = ['TEXT', 'VARCHAR', 'INT', 'INTEGER', 'BIGINT', 'SMALLINT', 'BOOLEAN', 'BOOL', 'NUMERIC', 'DECIMAL', 'FLOAT', 'DOUBLE PRECISION', 'REAL', 'DATE', 'TIMESTAMP', 'TIMESTAMPTZ', 'TIME', 'JSON', 'JSONB', 'UUID', 'BYTEA'];
+        $allowedSqlFunctions = array_merge($columnTypeCasting, ['CASE', 'WHEN', 'THEN', 'ELSE', 'END', 'CONCAT', 'COALESCE', 'CAST', 'NULLIF', 'UPPER', 'LOWER', 'LENGTH', 'SUBSTRING', 'TRIM', 'ZONE', 'TO_CHAR', 'AT', 'IS', 'NOT', 'NULL', 'TO_TIMESTAMP', 'POSITION']);
 
         /** xavfsiz sql ifodalari */
         $safeSqlPattern = '/^[a-zA-Z0-9_$. ()=><\'",\-+*\/:]+$/u';
@@ -275,7 +276,9 @@ class ASTValidator
                     throw new \Exception("⛔️ Invalid alias name in '{$m[0]}'");
                 }
 
-                if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$|^\*$/', $invalidColumn)) {
+                if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*(::('.implode('|', array_map(function($type) {
+                        return str_replace(' ', '\s', $type);
+                    }, $columnTypeCasting)).'))?$|^\*$/i', $invalidColumn)) {
                     throw new \Exception("⛔️ Invalid column name in '{$m[0]}'");
                 }
             }
@@ -287,7 +290,9 @@ class ASTValidator
                 $alias = $match[1];
                 $column = $match[2];
 
-                if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$|^\*$/', $column)) {
+                if (!preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*(::('.implode('|', array_map(function($type) {
+                        return str_replace(' ', '\s', $type);
+                    }, $columnTypeCasting)).'))?$|^\*$/i', $column)) {
                     throw new \Exception("⛔️ Invalid column name in '{$match[0]}'");
                 }
 

@@ -38,7 +38,7 @@ class SqlBuilder
                 throw new \Exception('⛔️ '.preg_replace('/SQLSTATE\[\d+\]: /', '', self::modelErrorsToString($e)));
             }
 
-            return $this->jsonToArray($this->countable ? $resultData : $resultData[0], $params, $callbackList);
+            return $this->jsonToArray($resultData, $params, $callbackList);
         }
         return [];
     }
@@ -109,7 +109,7 @@ class SqlBuilder
      */
     private function queryBuilder(array $sqlPart, array $params, string $dataTypeList): array
     {
-        $sql = $this->sqlCollector($sqlPart, $params, $dataTypeList);
+        $sql = $this->sqlCollector($sqlPart, $dataTypeList);
         $validator = new ASTValidator();
         $issues = $validator->validate($sql);
         if (!empty($issues)) {
@@ -131,7 +131,7 @@ class SqlBuilder
         ]);
         $param_list = [
             ':last_number' => (int)($params['last_number'] ?? null),
-            ':limit' => (int)($params['limit'] ?? 1)
+            ':limit' => (int)$params['count']
         ];
         foreach ($params['query_params'] ?? [] as $key => $param) {
             $param_list[$key] = $param;
@@ -139,7 +139,7 @@ class SqlBuilder
         return $db->createCommand($sql)->bindValues($param_list)->queryAll();
     }
 
-    private function sqlCollector(array $sqlPart, array $params, string $dataTypeList): string
+    private function sqlCollector(array $sqlPart, string $dataTypeList): string
     {
         $result = null;
         if ($dataTypeList === CteConstants::ROOT_RELATION_DATA_TYPE) {

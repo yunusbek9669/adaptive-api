@@ -3,6 +3,7 @@
 namespace Yunusbek\AdaptiveApi\traits;
 
 use Yunusbek\AdaptiveApi\ASTValidator;
+use Exception;
 use yii\db\Expression;
 
 trait OperatorsTrait
@@ -12,6 +13,7 @@ trait OperatorsTrait
      * @param string|null $alias
      * @param string|null $prefix
      * @return string|null
+     * @throws Exception
      */
     private function condition(array $condition, string $alias = null, string $prefix = null): ?string
     {
@@ -42,8 +44,22 @@ trait OperatorsTrait
                         $where[] = "$columnDefinition IN ({$value})";
                     } elseif ($value instanceof Expression) {
                         $where[] = "$columnDefinition = {$value}";
+                    } elseif (str_starts_with($value, ':')) {
+                        if (str_ends_with($value, '_list')) {
+                            if (str_ends_with($value, '_int_list')) {
+                                $where[] = "$columnDefinition = ANY({$value}::int[])";
+                            } elseif (str_ends_with($value, '_text_list')) {
+                                $where[] = "$columnDefinition = ANY({$value}::text[])";
+                            } elseif (str_ends_with($value, '_bool_list')) {
+                                $where[] = "$columnDefinition = ANY({$value}::bool[])";
+                            } else {
+                                throw new Exception("⛔️ Unknown list type for parameter '{$value}'");
+                            }
+                        } else {
+                            $where[] = "$columnDefinition = " . $value;
+                        }
                     } else {
-                        $where[] = "$columnDefinition = " . (str_starts_with($value, ':') ? $value : var_export($value, true));
+                        $where[] = "$columnDefinition = " . var_export($value, true);
                     }
                 }
             }
@@ -102,33 +118,27 @@ trait OperatorsTrait
 
     /** SELECT ichiga 'jsonb_build_object' qilib berish
      * @param string|array $data
-     * @param string|int|null $type
+     * @param string|null $type
      * @param string|null $key
      * @return string
      */
-    private function select(string|array $data, string|int $type = null, string &$key = null): string
+    private function select(string|array $data, string $type = null, string &$key = null): string
     {
         $condition = null;
         if (is_array($data)) {
             ASTValidator::detectIfNull($data, $condition, $type, $key);
             $flat = [];
             foreach ($data as $key => $value) {
-                if (!empty($type)) {
-                    $flat[] = "'".str_replace('{?}', '', $key)."'";
-                    $flat[] = is_array($value) ? $this->select($value, null, $key) : (str_contains($value, '.*') ? "to_jsonb({$value})" : $value);
-                } else {
-                    $flat[] = is_array($value) ? $this->select($value, null, $key) : $value;
-                }
+                $flat[] = "'".str_replace('{?}', '', $key)."'";
+                $flat[] = is_array($value) ? $this->select($value, null, $key) : (str_contains($value, '.*') ? "to_jsonb({$value})" : $value);
             }
             $data = implode(", ", $flat);
-            if (!empty($type)) {
-                $data = "       jsonb_build_object({$data})";
-            }
+            $data = "       jsonb_build_object({$data})";
         }
 
         if ($condition) { $data = "CASE WHEN COALESCE({$condition}) IS NOT NULL THEN {$data} END"; }
 
-        if (!empty($type) && !is_int($type)) {
+        if (isset($type)) {
             $type = str_replace('{?}', '', $type);
             if (str_ends_with($data, '.*')) {
                 $data = str_replace('.*', '', $data);

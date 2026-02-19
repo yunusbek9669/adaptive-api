@@ -3,6 +3,7 @@
 namespace Yunusbek\AdaptiveApi\traits;
 
 use Yunusbek\AdaptiveApi\ASTValidator;
+use Exception;
 use yii\db\ExpressionInterface;
 
 trait ReferenceTrait
@@ -86,6 +87,7 @@ trait ReferenceTrait
      * @param array $condition
      * @param bool $is_root
      * @return string|null
+     * @throws Exception
      */
     protected function partOfRoot(string $cte_name, array $data, array $condition, bool $is_root): ?string
     {
@@ -106,6 +108,7 @@ trait ReferenceTrait
      * @param array $data
      * @param array $condition
      * @return string
+     * @throws Exception
      */
     protected function remainingCte(string $cte_name, array $data, array $condition): string
     {
@@ -128,7 +131,7 @@ trait ReferenceTrait
                 SELECT COUNT(*) AS remaining_count
                 FROM {$data['table']} 
                 {$rootJoin}
-                WHERE (:last_number::integer IS NULL OR {$data['table']}.{$data['unique_number']} > :last_number::integer) {$and_where}
+                WHERE (:last_number::integer IS NULL OR {$data['unique_number']} > :last_number::integer) {$and_where}
             )
         SQL;
     }

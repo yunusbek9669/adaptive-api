@@ -8,7 +8,7 @@ use app\modules\manuals\models\ManualsLaborLeaveAction;
 use app\modules\manuals\models\ManualsLaborLeaveType;
 use Exception;
 
-class CteRootRelation
+class CteRootRelation2
 {
     public static function getCteRootRelation(string $cte, array $params): string
     {

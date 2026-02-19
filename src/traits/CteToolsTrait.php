@@ -2,7 +2,6 @@
 
 namespace Yunusbek\AdaptiveApi\traits;
 
-use Yunusbek\AdaptiveApi\CteConstants;
 use Exception;
 use yii\base\InvalidConfigException;
 use yii\db\ExpressionInterface;
@@ -13,50 +12,52 @@ trait CteToolsTrait
     use RootRelationTrait;
     use ReferenceTrait;
 
-    public $countable = false;
-
     /** API so‘rovdan keladigan parametrlarni qayta ishlash
      * @param array $params
      * @param array $addition
+     * @param bool $isRootRelation
      * @return array
      * @throws Exception
      */
-    protected function paramsHelper(array $params, array $addition): array
+    protected function paramsHelper(array $params, array $addition, bool $isRootRelation): array
     {
-        $queryString = urldecode(\Yii::$app->request->queryString);
-        $realParams = [];
-        foreach (explode('&', $queryString) as $part) {
-            if (str_contains($part, '=')) {
-                [$key, $value] = explode('=', $part, 2);
-                if (!in_array($key, ['limit', 'last_number'])) {
-                    $realParams[] = $key;
-                }
-            }
-        }
-        $this->countable = isset($params['limit']) && isset($params['limit']);
         $data = [];
         $data['condition'] = [];
-        $data['limit'] = (int)($params['limit'] ?? 1);
+        $data['count'] = (int)($params['count'] ?? 1000);
         $data['last_number'] = (int)($params['last_number'] ?? 0);
-        if (!empty($addition['query_params'])) {
+        $cteList = $isRootRelation ? $this->cteList[$this->from] : ['filter' => []];
+        if (!empty($addition['query_params']))
+        {
             $data['query_params'] = [];
             $iteration = 0;
-            foreach ($addition['query_params'] as $key => $param) {
-                $errorKey = $realParams[$iteration] ?? $key;
-                if (preg_match("/(;|--|#|\/\*)[\s]*/", $key)) {
-                    throw new Exception("⚠️ Invalid parameter key used: '{$errorKey}'");
-                } elseif (preg_match("/(;|--|#|\/\*)[\s]*/", $param)) {
-                    throw new Exception("⚠️ Invalid parameter value used: '{$param}'");
+            foreach ($addition['query_params'] as $key => $param)
+            {
+                $filter = $cteList['filter'];
+
+                // filter arrayini field => [column, type] ko'rinishiga o'tkazamiz
+                $filterMap = [];
+                foreach ($filter as $fullKey => $column) {
+                    $explode = explode(':', $fullKey);
+                    $filterMap[$explode[0]] = ['column' => $column, 'type' => $explode[1] ?? null];
                 }
-                if (!preg_match('/^([a-zA-Z_][a-zA-Z0-9_]*)\.([a-zA-Z_][a-zA-Z0-9_]*)$/', $key, $matches) && preg_match('/^<([a-zA-Z_][a-zA-Z0-9_]*)>([a-zA-Z_][a-zA-Z0-9_]*)$/', $key, $matches)) {
-                    $data['condition']["{$matches[1]}.{$matches[2]}"] = ":query_param_{$iteration}";
-                } elseif (preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $key)) {
-                    $data['condition'][$key] = ":query_param_{$iteration}";
+
+                if (!empty($filterMap[$key]) || !$isRootRelation)
+                {
+                    if (preg_match("/(;|--|#|\/\*)[\s]*/", $key)) {
+                        throw new Exception("⚠️ Invalid parameter name used: '{$key}'");
+                    } elseif (preg_match("/(;|--|#|\/\*)[\s]*/", $param)) {
+                        throw new Exception("⚠️ Invalid parameter value used: '{$param}'");
+                    }
+                    $_suffix = $this->isJsonArray($param, $filterMap[$key]['type'] ?? null);
+                    if (!preg_match('/^([a-zA-Z_][a-zA-Z0-9_]*)\.([a-zA-Z_][a-zA-Z0-9_]*)$/', $key, $matches)) {
+                        $data['condition'][$key] = ":query_param_{$iteration}{$_suffix}";
+                    }
+                    $data['query_params'][":query_param_{$iteration}{$_suffix}"] = $param;
+                    $iteration++;
                 } else {
-                    throw new Exception("⚠️ Invalid parameter key used: '{$errorKey}'");
+                    $allowedFilters = implode(', ', array_keys($filter));
+                    throw new \Exception("⛔️ Unknown filter detected: '{$key}'. Allowed filters are: {{$allowedFilters}}");
                 }
-                $data['query_params'][":query_param_{$iteration}"] = $param;
-                $iteration++;
             }
         }
         return $data;
@@ -275,5 +276,24 @@ trait CteToolsTrait
             $camelCase
         );
         return ltrim($result, '_');
+    }
+
+    private function isJsonArray(string &$param, ?string $type = null): string
+    {
+        $decoded = json_decode($param, true);
+
+        if (!is_array($decoded)) {
+            return '';
+        }
+        $type = $type ?? 'int';
+        $formatting = match ($type) {
+            'int' => ['type' => "_int", 'format' => 'intval'],
+            'text', 'string' => ['type' => "_text", 'format' => 'strval'],
+            'bool' => ['type' => "_bool", 'format' => 'boolval']
+        };
+
+        $param = '{' . implode(',', array_map($formatting['format'], $decoded)) . '}';
+
+        return $formatting['type'].'_list';
     }
 }
