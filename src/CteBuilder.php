@@ -141,19 +141,15 @@ class CteBuilder extends SqlBuilder
         $this->params = $this->paramsHelper($this->queryParams, ['query_params' => array_diff_key($this->queryParams, array_flip(['count', 'last_number']))], $this->data_type === CteConstants::ROOT_RELATION_DATA_TYPE);
         $this->result = $this->jsonBuilder($this->template, $this->data_type, $this->callbackList);
 
-        if ($this->countable) {
-            $last_number = $this->result['last_number'] ?? 0;
-            $left = $this->result['left'] ?? 0;
-            unset($this->result['last_number'], $this->result['left']);
-            return [
-                'left' => $left,
-                'came_count' => count($this->result),
-                'last_number' => $last_number,
-                'items' => $this->result
-            ];
-        } else {
-            return $this->result;
-        }
+        $last_number = $this->result['last_number'] ?? 0;
+        $left = $this->result['left'] ?? 0;
+        unset($this->result['last_number'], $this->result['left']);
+        return [
+            'left' => $left,
+            'came_count' => count($this->result),
+            'last_number' => $last_number,
+            'items' => $this->result
+        ];
     }
 
     /**
