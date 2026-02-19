@@ -49,10 +49,13 @@ trait CteToolsTrait
                         throw new Exception("⚠️ Invalid parameter value used: '{$param}'");
                     }
                     $_suffix = $this->isJsonArray($param, $filterMap[$key]['type'] ?? null);
-                    if (!preg_match('/^([a-zA-Z_][a-zA-Z0-9_]*)\.([a-zA-Z_][a-zA-Z0-9_]*)$/', $key, $matches)) {
-                        $data['condition'][$key] = ":query_param_{$iteration}{$_suffix}";
+                    $param_alias = ":query_param_{$iteration}{$_suffix}";
+                    if (!preg_match('/^([a-zA-Z_][a-zA-Z0-9_]*)\.([a-zA-Z_][a-zA-Z0-9_]*)$/', $key, $matches) && preg_match('/^<([a-zA-Z_][a-zA-Z0-9_]*)>([a-zA-Z_][a-zA-Z0-9_]*)$/', $key, $matches)) {
+                        $data['condition']["{$matches[1]}.{$matches[2]}"] = $param_alias;
+                    } elseif (!preg_match('/^([a-zA-Z_][a-zA-Z0-9_]*)\.([a-zA-Z_][a-zA-Z0-9_]*)$/', $key, $matches)) {
+                        $data['condition'][$key] = $param_alias;
                     }
-                    $data['query_params'][":query_param_{$iteration}{$_suffix}"] = $param;
+                    $data['query_params'][$param_alias] = $param;
                     $iteration++;
                 } else {
                     $allowedFilters = implode(', ', array_keys($filter));

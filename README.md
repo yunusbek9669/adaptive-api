@@ -252,7 +252,7 @@ $response = CteBuilder::root($root) // root table
 **Method:** `POST`  
 **Description:**  
 This endpoint returns reference data from related tables using dynamic field selection and alias-based filtering.  
-It supports both pagination (`limit`) and relation field filters (e.g. `<department>code=av`).
+It supports both pagination (`count`) and relation field filters (e.g. `<department>code=av`).
 
 ---
 
@@ -260,10 +260,11 @@ It supports both pagination (`limit`) and relation field filters (e.g. `<departm
 
 ### 🔹 Query Parameters
 
-| Name | Type | Required | Description |
-|------|------|-----------|--------------|
-| `limit` | `integer` | ❌ | The number of records to return. Example: `4` |
-| `<department>code` | `string` | ❌ | Filter applied to the related table `department.code`. Example: `av` |
+| Name                           | Required | value                        | Description                                                                                                                                 |
+|--------------------------------|----------|------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------|
+| `count`                        | ❌        | `4`                          | The number of records to return. Example: `4`                                                                                               |
+| `attribute_name`               | ❌        | `11` or `[11,15,22]`         | Filter applied to the related table `{alias}.attribute_name`. Example: `attribute_name=11` or `attribute_name in (11,15,22)`                |
+| `<relatedAlias>attribute_name` | ❌        | `2234` or `[2234,2264,2431]` | Filter applied to the related table `{relatedAlias}.attribute_name`. Example: `attribute_name=2234` or `attribute_name in (2234,2264,2431)` |
 
 > 📝 **Note:**  
 > The `<department>` prefix indicates that the field belongs to a related (joined) table or alias.
@@ -272,10 +273,10 @@ It supports both pagination (`limit`) and relation field filters (e.g. `<departm
 
 ### 🔹 Request Body (JSON)
 
-| Field | Type | Required | Description |
-|--------|------|-----------|--------------|
-| `users` | `string` | ✅ | Pattern for selecting fields from the `users` CTE/table. `{users}.*` means “select all columns.” |
-| `department` | `string` | ✅ | Pattern for including all fields from the related `department` table or CTE. `<{department}>.*` means “include all columns.” |
+| Field        | Required | Description                                                                                                                  |
+|--------------|----------|------------------------------------------------------------------------------------------------------------------------------|
+| `users`      | ✅        | Pattern for selecting fields from the `users` CTE/table. `{users}.*` means “select all columns.”                             |
+| `department` | ✅        | Pattern for including all fields from the related `department` table or CTE. `<{department}>.*` means “include all columns.” |
 
 #### Example:
 
@@ -289,4 +290,4 @@ It supports both pagination (`limit`) and relation field filters (e.g. `<departm
 ### 🧾 Example Request
 
 ```bash
-GET /reference?limit=4&<department>code=av
+GET /reference?count=4&<department>code=av
