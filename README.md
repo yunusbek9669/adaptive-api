@@ -35,7 +35,7 @@ Installation
 ```dotenv
 API_DB_ROLE=api_reader
 API_DB_USER=api_user_api
-API_DB_PASSWORD=_@p!_reaDer_
+API_DB_PASSWORD=_p@$$word_
 #API_DB_HOST=localhost
 #API_DB_NAME=your-dbname
 #API_DB_PORT=5432
